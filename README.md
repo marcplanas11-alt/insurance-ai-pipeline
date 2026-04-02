@@ -25,3 +25,5 @@ This project builds a Python pipeline to:
 
 ## Example Insight
 Smokers or higher-risk profiles can be better analysed once coverage limits are structured.
+## Author
+Marc Planas — AI-Enabled Insurance Operations
