@@ -44,3 +44,6 @@ This pipeline allows insurers or MGAs to:
 - Standardize policy wording across providers
 - Compare coverage levels consistently
 - Identify high-risk policies automatically
+## ✅ Validation
+
+The pipeline is tested using pytest and automatically validated via GitHub Actions on each commit.
