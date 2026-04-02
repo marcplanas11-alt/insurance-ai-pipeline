@@ -27,3 +27,20 @@ This project builds a Python pipeline to:
 Smokers or higher-risk profiles can be better analysed once coverage limits are structured.
 ## Author
 Marc Planas — AI-Enabled Insurance Operations
+## 📊 Example Output
+
+| VetFees_type | Avg Limit (£) |
+|-------------|--------------|
+| no_limit    | Unlimited    |
+| has_limit   | 4,500        |
+
+## 💡 Key Insight
+
+Policies with "no limit" coverage represent higher exposure and require different underwriting strategies compared to fixed-limit policies.
+
+## 🚀 Business Use Case
+
+This pipeline allows insurers or MGAs to:
+- Standardize policy wording across providers
+- Compare coverage levels consistently
+- Identify high-risk policies automatically
