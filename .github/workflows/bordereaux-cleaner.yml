@@ -1,1 +1,171 @@
+name: Bordereaux Cleaner
 
+on:
+  workflow_dispatch:
+    inputs:
+      file_url:
+        description: 'Paste a direct download URL to your bordereaux file (CSV or XLSX)'
+        required: false
+        default: ''
+      sample_data:
+        description: 'No file? Type YES to run on built-in sample data instead'
+        required: false
+        default: 'NO'
+
+jobs:
+  clean-bordereaux:
+    name: Clean Bordereaux File
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pandas openpyxl requests
+
+      - name: Download file (if URL provided)
+        if: ${{ github.event.inputs.file_url != '' }}
+        run: |
+          mkdir -p input
+          echo "Downloading file from provided URL..."
+          curl -L "${{ github.event.inputs.file_url }}" -o input/bordereaux_input.csv
+          echo "File downloaded:"
+          ls -lh input/
+
+      - name: Generate sample data (if no URL)
+        if: ${{ github.event.inputs.file_url == '' }}
+        run: |
+          mkdir -p input
+          python3 - << 'PYEOF'
+          import pandas as pd
+          df = pd.DataFrame({
+              'Policy Number':  ['POL001','POL001','POL003','POL004','POL005', None],
+              'Insured Name':   ['Acme Ltd','Acme Ltd','Beta Corp','Gamma SA','Delta Plc', None],
+              'Inception Date': ['01/01/2025','01/01/2025','15/03/2025','2025-06-01','01/09/2025', None],
+              'Expiry Date':    ['01/01/2026','01/01/2026','14/03/2025','2026-06-01','01/09/2026', None],
+              'Gross Premium':  ['£1,200.00','£1,200.00','€850,50','(500.00)','3400', None],
+              'Currency':       ['GBP','GBP','eur','PESO','USD', None],
+              'Class of Business': ['Property','Property','Liability','Motor','Marine', None],
+          })
+          df.to_csv('input/bordereaux_input.csv', index=False)
+          print("Sample bordereaux created with intentional issues:")
+          print("  - 1 duplicate policy (POL001)")
+          print("  - 1 date error (POL003 expiry before inception)")
+          print("  - 1 invalid currency (PESO)")
+          print("  - 1 blank row")
+          print("  - Mixed premium formats (£, €, brackets, plain)")
+          print(df.to_string())
+          PYEOF
+
+      - name: Run bordereaux cleaner
+        run: |
+          python3 - << 'PYEOF'
+          import sys
+          sys.path.insert(0, '.')
+          import pandas as pd
+          from datetime import datetime
+          from src.bordereaux_cleaner import clean_bordereaux
+
+          # Load input file
+          filepath = 'input/bordereaux_input.csv'
+          try:
+              df_raw = pd.read_csv(filepath)
+          except Exception as e:
+              print(f"ERROR loading file: {e}")
+              sys.exit(1)
+
+          print(f"\n{'='*60}")
+          print(f"  BORDEREAUX CLEANER — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+          print(f"{'='*60}")
+          print(f"  Input rows:    {len(df_raw)}")
+          print(f"  Input columns: {list(df_raw.columns)}")
+          print(f"{'='*60}\n")
+
+          # Run pipeline
+          df_clean, report, issues = clean_bordereaux(df_raw)
+
+          # Print quality report
+          print("QUALITY REPORT")
+          print("-" * 40)
+          print(f"  Rows after cleaning:    {report['total_rows']}")
+          print(f"  Date errors flagged:    {report['date_errors']}")
+          print(f"  Invalid currencies:     {report['invalid_currencies']}")
+          if report.get('total_premium'):
+              print(f"  Total gross premium:    {report['total_premium']:,.2f}")
+              print(f"  Average premium:        {report['avg_premium']:,.2f}")
+          if report.get('currencies'):
+              print(f"  Currencies found:       {report['currencies']}")
+
+          if issues:
+              print(f"\nSTRUCTURAL ISSUES:")
+              for issue in issues:
+                  print(f"  WARNING: {issue}")
+          else:
+              print(f"\n  No structural issues found.")
+
+          # Detail flags
+          if 'date_error' in df_clean.columns and df_clean['date_error'].sum() > 0:
+              bad = df_clean[df_clean['date_error']][['policy_number','inception_date','expiry_date']]
+              print(f"\nDATE ERRORS:")
+              print(bad.to_string(index=False))
+
+          if 'currency_valid' in df_clean.columns and (~df_clean['currency_valid']).sum() > 0:
+              bad = df_clean[~df_clean['currency_valid']][['policy_number','currency']]
+              print(f"\nINVALID CURRENCIES:")
+              print(bad.to_string(index=False))
+
+          if 'has_missing_required' in df_clean.columns and df_clean['has_missing_required'].sum() > 0:
+              n = df_clean['has_missing_required'].sum()
+              print(f"\nWARNING: {n} row(s) have missing required fields")
+
+          # Save outputs
+          import os
+          os.makedirs('output', exist_ok=True)
+          timestamp = datetime.now().strftime('%Y%m%d_%H%M')
+
+          # Clean Excel
+          out_excel = f'output/bordereaux_CLEAN_{timestamp}.xlsx'
+          df_clean.to_excel(out_excel, index=False)
+          print(f"\nSaved clean file: {out_excel}")
+
+          # Errors-only Excel (for review)
+          error_rows = df_clean[
+              df_clean.get('date_error', pd.Series(False, index=df_clean.index)) |
+              (~df_clean.get('currency_valid', pd.Series(True, index=df_clean.index))) |
+              df_clean.get('has_missing_required', pd.Series(False, index=df_clean.index))
+          ]
+          if len(error_rows) > 0:
+              out_errors = f'output/bordereaux_ERRORS_{timestamp}.xlsx'
+              error_rows.to_excel(out_errors, index=False)
+              print(f"Saved errors file: {out_errors} ({len(error_rows)} row(s) need review)")
+
+          # Text summary report
+          with open(f'output/quality_report_{timestamp}.txt', 'w') as f:
+              f.write(f"BORDEREAUX QUALITY REPORT\n")
+              f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n")
+              f.write(f"{'='*40}\n")
+              for k, v in report.items():
+                  f.write(f"{k}: {v}\n")
+              if issues:
+                  f.write(f"\nISSUES:\n")
+                  for issue in issues:
+                      f.write(f"  - {issue}\n")
+          print(f"Saved quality report: output/quality_report_{timestamp}.txt")
+          print(f"\n{'='*60}")
+          print(f"  COMPLETE — download outputs from the Artifacts section below")
+          print(f"{'='*60}")
+          PYEOF
+
+      - name: Upload cleaned files as artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bordereaux-cleaned-${{ github.run_number }}
+          path: output/
+          retention-days: 30
