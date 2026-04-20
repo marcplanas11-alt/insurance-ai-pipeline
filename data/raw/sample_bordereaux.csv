@@ -1,0 +1,11 @@
+policy_number,insured_name,inception_date,expiry_date,gross_premium,currency,VetFees
+POL001,Acme Ltd,2024-01-01,2025-01-01,1200.00,GBP,"Claim limit £10,000, excess £250"
+POL002,Beta Corp,2024-03-15,2025-03-15,850.50,EUR,"Maximum coverage €5,000 with €500 excess"
+POL003,Gamma SA,2024-06-01,2025-06-01,3400.00,USD,"Unlimited coverage, $1000 deductible"
+POL004,Delta Plc,2024-02-10,2025-02-10,2100.75,GBP,"£15,000 limit £150 excess"
+POL005,Epsilon Inc,2024-04-20,2025-04-20,950.00,GBP,"Coverage up to £8,500 with minimum excess of £400"
+POL006,Zeta Corp,2024-05-05,2025-05-05,1500.00,USD,"Max $20,000 claim $750 deductible"
+POL007,Eta Ltd,2024-07-15,2025-07-15,2250.00,GBP,"Limit: £12,000 Excess: £300"
+POL008,Theta Plc,2024-08-01,2025-08-01,1850.00,EUR,"Coverage limited to €7,500, excess €600"
+POL009,Iota SA,2024-09-10,2025-09-10,3100.00,GBP,"£25,000 limit, £200 excess"
+POL010,Kappa Inc,2024-10-15,2025-10-15,2400.00,USD,"$30,000 maximum, $500 deductible"
