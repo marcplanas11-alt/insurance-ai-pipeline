@@ -1,1 +1,11 @@
-
+Policy Number,Insured Name,Inception Date,Expiry Date,Gross Premium,Currency,Class of Business,VetFees,ClaimLimit,AnnualPremiumAmount
+POL001,Acme Pet Ltd,01/01/2025,01/01/2026,"£1,200.00",GBP,VetFees,"limit of £5,000 per condition excess £250",5000.0,1200.0
+POL001,Acme Pet Ltd,01/01/2025,01/01/2026,"£1,200.00",GBP,VetFees,"limit of £5,000 per condition excess £250",5000.0,1200.0
+POL003,Beta Animal Care,15/03/2025,14/03/2025,€850.50,eur,VetFees,"maximum cover £10,000 annual excess £500",10000.0,850.0
+POL004,Gamma Vets SA,2025-06-01,2026-06-01,(500.00),PESO,Liability,unlimited coverage for all conditions,,500.0
+POL005,Delta Paws Plc,01/09/2025,01/09/2026,3400,USD,VetFees,"coverage £2,500 no excess",2500.0,3400.0
+POL006,Epsilon Dogs Ltd,01/01/2025,01/01/2026,"£2,100.00",GBP,VetFees,"limit £8,000 per condition excess £100",8000.0,2100.0
+POL007,Zeta Cats Co,01/02/2025,01/02/2026,£875.50,GBP,VetFees,"maximum £3,000 excess £200",3000.0,875.0
+POL008,Eta Reptiles,01/03/2025,01/03/2026,£650.00,GBP,VetFees,"cover up to £4,500 excess £150",4500.0,650.0
+POL009,Theta Birds Inc,01/04/2025,01/04/2026,"£1,800.00",GBP,VetFees,"limit of £12,000 excess £350",12000.0,1800.0
+POL010,,,,,,,,,
