@@ -174,12 +174,12 @@ def flag_missing_required(df: pd.DataFrame) -> pd.DataFrame:
 # SUMMARY REPORT
 # ─────────────────────────────────────────────────────────────
 
-def summary_report(df: pd.DataFrame) -> dict:
+def summary_report(df: pd.DataFrame, blank_rows_removed: int = 0) -> dict:
     """Return a dict of key data quality metrics."""
     report = {
         "total_rows":          len(df),
         "total_columns":       len(df.columns),
-        "blank_rows_removed":  df.get("has_missing_required", pd.Series(dtype=bool)).sum(),
+        "blank_rows_removed":  blank_rows_removed,
         "date_errors":         int(df["date_error"].sum()) if "date_error" in df.columns else 0,
         "invalid_currencies":  int((~df["currency_valid"]).sum()) if "currency_valid" in df.columns else 0,
         "total_premium":       round(df["gross_premium"].sum(), 2) if "gross_premium" in df.columns else None,
@@ -213,7 +213,9 @@ def clean_bordereaux(df: pd.DataFrame) -> tuple:
         issues.append(f"Missing required columns: {missing_cols}")
 
     # Step 3 — remove blank rows
+    _before_blank = len(df)
     df = remove_blank_rows(df)
+    blank_rows_removed = _before_blank - len(df)
 
     # Step 4 — remove duplicates
     df = remove_duplicate_policies(df)
@@ -234,6 +236,6 @@ def clean_bordereaux(df: pd.DataFrame) -> tuple:
     df = flag_missing_required(df)
 
     # Step 10 — build report
-    report = summary_report(df)
+    report = summary_report(df, blank_rows_removed=blank_rows_removed)
 
     return df, report, issues

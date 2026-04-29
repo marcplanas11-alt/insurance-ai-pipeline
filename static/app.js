@@ -43,7 +43,7 @@ function setFile(prefix, file) {
   nameEl.classList.remove('hidden');
   document.getElementById(prefix + '-run').disabled = false;
   document.getElementById(prefix + '-status').textContent = '';
-  document.getElementById(prefix + (prefix === 'vetfees' ? '-results' : '-results')).classList.add('hidden');
+  document.getElementById(prefix + '-results').classList.add('hidden');
 }
 
 function formatBytes(b) {
@@ -238,20 +238,24 @@ function copyQuery(id, btn) {
   });
 }
 
-// Basic SQL syntax highlighting
+// Basic SQL syntax highlighting.
+// Order matters: comments and strings first (so keywords inside them aren't coloured),
+// then functions before keywords so shared names (COUNT, SUM, etc.) get the function style.
 function highlightSql(html) {
-  const keywords = /\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|HAVING|JOIN|LEFT|RIGHT|INNER|OUTER|ON|AS|CASE|WHEN|THEN|ELSE|END|AND|OR|NOT|IN|IS|NULL|DISTINCT|COUNT|ROUND|AVG|SUM|MIN|MAX|OVER|PARTITION BY|RANK|CUME_DIST|NTILE|CONCAT|COALESCE|NULLIF|STDDEV|BY|WITH|LIMIT|OFFSET|ASC|DESC|INTO|INSERT|UPDATE|DELETE|CREATE|TABLE|INDEX|VIEW|DROP|ALTER|SET|VALUES)\b/g;
+  const comments  = /(--[^\n]*)/g;
+  const strings   = /('[^']*')/g;
+  // Function names only — coloured before keywords to prevent keyword class overwriting them
   const functions = /\b(RANK|CUME_DIST|NTILE|COUNT|ROUND|AVG|SUM|MIN|MAX|COALESCE|NULLIF|STDDEV|CONCAT|CAST|CONVERT|ISNULL|NVL|TO_DATE|DATE_TRUNC|EXTRACT)\b/g;
-  const strings  = /('[^']*')/g;
-  const numbers  = /\b(\d+(?:\.\d+)?)\b/g;
-  const comments = /(--[^\n]*)/g;
+  // Keywords that are not also function names
+  const keywords  = /\b(SELECT|FROM|WHERE|HAVING|JOIN|LEFT|RIGHT|INNER|OUTER|ON|AS|CASE|WHEN|THEN|ELSE|END|AND|OR|NOT|IN|IS|NULL|DISTINCT|OVER|BY|WITH|LIMIT|OFFSET|ASC|DESC|INTO|INSERT|UPDATE|DELETE|CREATE|TABLE|INDEX|VIEW|DROP|ALTER|SET|VALUES|GROUP|ORDER|PARTITION)\b/g;
+  const numbers   = /\b(\d+(?:\.\d+)?)\b/g;
 
   return html
-    .replace(comments, '<span class="sql-cmt">$1</span>')
-    .replace(strings,  '<span class="sql-str">$1</span>')
-    .replace(keywords, '<span class="sql-kw">$1</span>')
-    .replace(functions,'<span class="sql-fn">$1</span>')
-    .replace(numbers,  '<span class="sql-num">$1</span>');
+    .replace(comments,  '<span class="sql-cmt">$1</span>')
+    .replace(strings,   '<span class="sql-str">$1</span>')
+    .replace(functions, '<span class="sql-fn">$1</span>')
+    .replace(keywords,  '<span class="sql-kw">$1</span>')
+    .replace(numbers,   '<span class="sql-num">$1</span>');
 }
 
 // ─── TABLE RENDERER ──────────────────────────────────────────

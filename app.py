@@ -43,8 +43,11 @@ def _save_job(df: pd.DataFrame, label: str) -> str:
     job_id = str(uuid.uuid4())
     path = f"/tmp/{job_id}_{label}.xlsx"
     df_out = df.copy()
-    for col in df_out.select_dtypes(include=["datetime64[ns]", "datetime64[ns, UTC]"]).columns:
-        df_out[col] = df_out[col].dt.strftime("%Y-%m-%d")
+    for col in df_out.columns:
+        if pd.api.types.is_datetime64_any_dtype(df_out[col]):
+            # Excel/openpyxl requires tz-naive datetimes
+            if getattr(df_out[col].dt, "tz", None) is not None:
+                df_out[col] = df_out[col].dt.tz_localize(None)
     df_out.to_excel(path, index=False)
     _jobs[job_id] = path
     return job_id

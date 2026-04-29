@@ -82,12 +82,14 @@ def main():
 
     # ── Audit flags summary ───────────────────────────────────
     if "date_error" in df_clean.columns and df_clean["date_error"].sum() > 0:
-        bad = df_clean[df_clean["date_error"]][["policy_number","inception_date","expiry_date"]]
+        date_cols = [c for c in ["policy_number", "inception_date", "expiry_date"] if c in df_clean.columns]
+        bad = df_clean[df_clean["date_error"]][date_cols]
         print(f"\n{RED}  Policies with date errors:{RESET}")
         print(bad.to_string(index=False))
 
     if "currency_valid" in df_clean.columns and (~df_clean["currency_valid"]).sum() > 0:
-        bad = df_clean[~df_clean["currency_valid"]][["policy_number","currency"]]
+        ccy_cols = [c for c in ["policy_number", "currency"] if c in df_clean.columns]
+        bad = df_clean[~df_clean["currency_valid"]][ccy_cols]
         print(f"\n{RED}  Policies with invalid currency:{RESET}")
         print(bad.to_string(index=False))
 
