@@ -28,3 +28,10 @@ Thumbs.db
 
 # Temporary pipeline output
 /tmp/
+
+# Data & pipeline artefacts
+data/processed/
+*.xlsx
+*.xls
+!input/*.xlsx
+!input/*.xls
