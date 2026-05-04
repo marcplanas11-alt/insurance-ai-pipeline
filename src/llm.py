@@ -2,6 +2,11 @@
 llm.py
 LLM-based fallback parsing for ambiguous or failed extractions.
 Currently a placeholder. Can be integrated with Claude API or other LLM.
+
+Migration note (May 2026):
+When implementing Claude integration, use claude-sonnet-4-6 or claude-opus-4-7.
+The 1M context window is now generally available (not beta) on these models.
+No longer use context-1m-2025-08-07 header—it has been retired.
 """
 
 import pandas as pd
