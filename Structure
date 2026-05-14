@@ -1,0 +1,11 @@
+Input: bordereaux CSV
+        ↓
+n8n trigger
+        ↓
+Python validation
+        ↓
+exception routing
+        ↓
+accepted / data quality / finance / underwriting
+        ↓
+pipeline parsing / analytics
