@@ -1,0 +1,8 @@
+policy_number,insured_name,validation_status,validation_errors,routing_queue,review_required
+POL-001,Alpha Logistics Ltd,passed,,accepted,False
+POL-002,Bravo Retail SL,failed,duplicate_policy_number,data_quality_issue,True
+POL-003,Charlie Foods SAS,failed,invalid_inception_date,data_quality_issue,True
+POL-004,Delta Tech GmbH,failed,negative_premium,finance_review,True
+POL-005,Echo Motors Ltd,failed,missing_country; missing_required_field,data_quality_issue,True
+POL-002,Foxtrot Hotels SA,failed,duplicate_policy_number,data_quality_issue,True
+POL-006,Gamma Energy BV,failed,invalid_class_of_business,underwriting_review,True
