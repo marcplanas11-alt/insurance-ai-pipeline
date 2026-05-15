@@ -1,0 +1,83 @@
+{
+  "name": "Insurance Bordereaux Intake Validation Workflow",
+  "description": "Simplified n8n-style workflow showing how bordereaux intake validation and exception routing could be orchestrated before downstream parsing.",
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Receive Bordereaux CSV",
+      "type": "manualTrigger",
+      "position": [100, 300]
+    },
+    {
+      "id": "2",
+      "name": "Run Intake Validation",
+      "type": "executeCommand",
+      "position": [350, 300],
+      "parameters": {
+        "command": "python -m src.intake_validation"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Read Validation Report",
+      "type": "readCsv",
+      "position": [600, 300],
+      "parameters": {
+        "filePath": "outputs/validation_report_sample.csv"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Route Exceptions",
+      "type": "if",
+      "position": [850, 300],
+      "parameters": {
+        "conditions": [
+          {
+            "field": "routing_queue",
+            "operator": "notEquals",
+            "value": "accepted"
+          }
+        ]
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send to Review Queue",
+      "type": "notification",
+      "position": [1100, 200],
+      "parameters": {
+        "queues": [
+          "data_quality_issue",
+          "finance_review",
+          "underwriting_review",
+          "manual_review"
+        ]
+      }
+    },
+    {
+      "id": "6",
+      "name": "Continue to Existing Parsing Pipeline",
+      "type": "executeCommand",
+      "position": [1100, 400],
+      "parameters": {
+        "command": "python run_cleaner.py"
+      }
+    }
+  ],
+  "connections": {
+    "Receive Bordereaux CSV": {
+      "main": [["Run Intake Validation"]]
+    },
+    "Run Intake Validation": {
+      "main": [["Read Validation Report"]]
+    },
+    "Read Validation Report": {
+      "main": [["Route Exceptions"]]
+    },
+    "Route Exceptions": {
+      "main": [["Send to Review Queue"], ["Continue to Existing Parsing Pipeline"]]
+    }
+  },
+  "note": "This is a simplified n8n-style representation for portfolio documentation. The functional validation logic is implemented in Python."
+}
