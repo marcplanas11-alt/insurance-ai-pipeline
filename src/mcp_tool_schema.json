@@ -1,0 +1,38 @@
+{
+  "name": "validate_bordereaux_intake",
+  "description": "Validates incoming insurance bordereaux records before downstream parsing and analytics. Detects data quality, finance and underwriting exceptions.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "file_path": {
+        "type": "string",
+        "description": "Path to the incoming bordereaux CSV file."
+      },
+      "output_path": {
+        "type": "string",
+        "description": "Path where the validation report should be written."
+      }
+    },
+    "required": ["file_path", "output_path"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "validation_report_path": {
+        "type": "string",
+        "description": "Path to the generated validation report."
+      },
+      "summary": {
+        "type": "object",
+        "properties": {
+          "accepted": { "type": "integer" },
+          "data_quality_issue": { "type": "integer" },
+          "finance_review": { "type": "integer" },
+          "underwriting_review": { "type": "integer" },
+          "manual_review": { "type": "integer" }
+        }
+      }
+    }
+  },
+  "portfolio_note": "This schema is a simplified MCP-compatible tool interface. It does not implement a full MCP server."
+}
