@@ -1,0 +1,8 @@
+policy_number,insured_name,inception_date,premium,country,class_of_business,coverholder,VetFees
+POL-001,Alpha Logistics Ltd,2026-01-01,12500,UK,Marine,London Coverholder A,"Vet fees covered up to £5,000 with £100 excess"
+POL-002,Bravo Retail SL,2026-02-15,8500,ES,Property,Madrid Coverholder B,"Coverage limit £2,500. Excess £75 applies"
+POL-003,Charlie Foods SAS,invalid-date,6200,FR,Liability,Paris Coverholder C,"VetFees max £3,000, no excess stated"
+POL-004,Delta Tech GmbH,2026-03-10,-3000,DE,Cyber,Berlin Coverholder D,"Limit £1,500 with £50 excess"
+POL-005,Echo Motors Ltd,2026-04-01,15000,,Motor,London Coverholder A,"Annual vet fees limit £4,000, excess £100"
+POL-002,Foxtrot Hotels SA,2026-05-20,9800,ES,Property,Madrid Coverholder B,"Cover up to £2,000 with £80 excess"
+POL-006,Gamma Energy BV,2026-06-01,22000,NL,Aviation,Amsterdam Coverholder E,"Vet fees covered to £10,000, £250 excess"
